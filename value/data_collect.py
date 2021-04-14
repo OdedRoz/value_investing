@@ -29,7 +29,8 @@ def collect_data(tickers=None, filters=None, custom=None, parallel=True):
 
     # data frame for all of the collected scrped data
     scrape_df = pd.DataFrame()
-
+    # for faster concat df
+    dict_list = []
     if parallel:
         with ThreadPoolExecutor() as pool:
             futures = []
@@ -38,7 +39,8 @@ def collect_data(tickers=None, filters=None, custom=None, parallel=True):
 
             for f in as_completed(futures):
                 ticker_df = f.result()
-                scrape_df = scrape_df.append(ticker_df)
+                dict_list.extend(ticker_df.to_dict('records'))
+            scrape_df = pd.DataFrame.from_dict(dict_list)
 
     else:
         count = 1
