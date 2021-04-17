@@ -1,4 +1,4 @@
-import value_investing.analyze
+import value_investing.analyze as analyze
 import pandas as pd
 from value_investing.parse import get_sector_filters
 from value_investing.data_collect import collect_data, sector_data
