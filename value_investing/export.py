@@ -6,6 +6,8 @@ from datetime import datetime
 import pathlib
 import os
 
+pathlib.Path("/my/directory").mkdir(parents=True, exist_ok=True)
+
 
 def export(data, method='csv', order_by='score'):
     # clean index
@@ -26,8 +28,15 @@ def export(data, method='csv', order_by='score'):
         data = data.sort_values(by=order_by, ascending=False)
 
     if method == 'csv':
+        # create folder if not exists
+        output_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'output'))
+        pathlib.Path(output_path).mkdir(parents=True, exist_ok=True)
+
+        # csv file name
         now = datetime.now()
         date_time = now.strftime("%m-%d-%Y_%H-%M-%S")
-        path = os.path.join(pathlib.Path().absolute(), 'output', f'data_{date_time}.csv')
+        path = os.path.join(output_path, f'data_{date_time}.csv')
         print(path)
+
+        # export
         data.to_csv(path, index=False)
