@@ -1,9 +1,9 @@
-import analyze
+import value_investing.analyze
 import pandas as pd
-from parse import get_sector_filters
-from data_collect import collect_data, sector_data
-from export import export
-from dividend_aristocrats import dividend_tickers
+from value_investing.parse import get_sector_filters
+from value_investing.data_collect import collect_data, sector_data
+from value_investing.export import export
+from value_investing.dividend_aristocrats import dividend_tickers
 
 
 
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     tickers.extend(dividend_tickers)
     filters = 'fa_ltdebteq_u0.8,fa_roe_o10,fa_curratio_o1'
     sector_ratio_filters = ['pe']
-    custom = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 31, 33, 35, 36, 37, 38, 39, 40, 41, 55, 56, 57, 58,
-              62, 65, 67, 69]
+    custom = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 31, 33,
+              35, 36, 37, 38, 39, 40, 41, 55, 56, 57, 58, 62, 65, 67, 69]
     find_analyze(tickers, filters, sector_ratio_filters, custom, parallel=True)
     print("--- %s seconds ---" % (time.time() - start_time))
