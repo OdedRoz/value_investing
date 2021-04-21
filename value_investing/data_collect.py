@@ -2,7 +2,7 @@
 this module gets all the data the main process needs from 3rd party's
 """
 
-import scrape
+from value_investing import scrape as scrape
 from finviz.screener import Screener
 from finvizfinance.group.valuation import Valuation
 import pandas as pd

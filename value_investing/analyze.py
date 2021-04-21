@@ -172,7 +172,8 @@ class Analyzer:
         :param x: iterable of chars
         :return: list
         """
-        return [int(ord(c) - 64) if c else None for c in x]
+        excepted = ['A', 'B', 'C', 'D', 'E', 'F']
+        return [int(ord(c) - 64) if c in excepted else None for c in x]
 
 
 #x = self.df['Zacks value score']
