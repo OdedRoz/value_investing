@@ -41,7 +41,7 @@ def find_analyze(tickers, filters, sector_ratio_filters, custom, parallel):
     analyzer = analyze.Analyzer(data)
     data = analyzer.score()
 
-    export(data, method='csv', order_by='score')
+    export(data, method='csv', order_by=['score','score recomm'])
 
 
 if __name__ == '__main__':
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     """
     import time
     start_time = time.time()
-    tickers = ['aapl', 'fb', 'tsla', 'momo', 'baba', 'stla']
+    tickers = ['aapl', 'fb', 'tsla', 'momo', 'baba', 'stla', 'bdsi']
     tickers.extend(dividend_tickers)
     filters = 'fa_ltdebteq_u0.8,fa_roe_o10,fa_curratio_o1'
     sector_ratio_filters = ['pe']

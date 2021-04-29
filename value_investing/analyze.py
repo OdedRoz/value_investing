@@ -1,4 +1,4 @@
-
+import traceback
 
 class Analyzer:
     def __init__(self, df):
@@ -69,6 +69,7 @@ class Analyzer:
                     filtered_df = self.filter(col, min=min, max=max, percentage=percentage)
                     self.point_by_index(filtered_df, importance)
             except Exception as e:
+                print(traceback.format_exc())
                 print(e)
                 print(f'error in col {col}')
 
@@ -86,7 +87,7 @@ class Analyzer:
         self.df['score recomm'] = self.df['score']
         # Zacks rank, Zacks value score, Zacks growth score
         self._zacks_score()
-        # Financial Strength, Profitability Rank, Valuation Rank
+        # Financial Strength, Profitability Rank, Valuation Rank, GF value score
         self._gf_score()
 
 
@@ -142,7 +143,7 @@ class Analyzer:
         add Financial Strength, Profitability Rank, Valuation Rank to scroe
         :return:
         """
-        for matric in ['Financial Strength', 'Profitability Rank', 'Valuation Rank']:
+        for matric in ['Financial Strength', 'Profitability Rank', 'Valuation Rank', 'GF value score']:
             self.df.loc[self.df[matric].notna(), 'score recomm'] += self.df.loc[self.df[matric].notna(), matric]
 
     def _gf_value(self):
@@ -161,9 +162,8 @@ class Analyzer:
         self.df.loc[(self.df['GF Value'] <= 0.8) & (self.df['GF Value'] > 0.7), 'GF value score'] = 2
         self.df.loc[(self.df['GF Value'] <= 0.7) & (self.df['GF Value'] > 0.6), 'GF value score'] = 3
         self.df.loc[(self.df['GF Value'] <= 0.6) & (self.df['GF Value'] > 0.5), 'GF value score'] = 4
-        self.df.loc[self.df['GF Value'] <= 0.5, 'GF value score'] = 5
-
-        self.df['score'] += self.df['GF value score']
+        # GF Value of 0 is an error
+        self.df.loc[(self.df['GF Value'] <= 0.5) & (self.df['GF Value'] > 0.0), 'GF value score'] = 5
 
     @staticmethod
     def _char_to_int(x):
