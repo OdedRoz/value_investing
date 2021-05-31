@@ -12,12 +12,16 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 def collect_ticker_data(ticker):
     # GF
     gf_scraper = scrape.GFScraper()
-    gf_ticker_df = gf_scraper.gf_scrape(ticker)
+    gf_ticker_df = gf_scraper.scrape(ticker)
 
     # Zacks
     zacks_scraper = scrape.ZacksScraper()
     zacks_rank = zacks_scraper.rank(ticker)
     zacks_ticker_df = pd.DataFrame({'Ticker': [ticker], **zacks_rank})
+
+    ## quickfs
+    #quickfs_scraper = scrape.QuickFSScraper()
+    #quickfs_ticker_df = quickfs_scraper.scrape(ticker)
 
     return pd.merge(gf_ticker_df, zacks_ticker_df, on='Ticker')
 

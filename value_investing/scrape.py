@@ -24,12 +24,12 @@ class GFScraper:
        'Price-to-Median-PS-Value', 'Price-to-Graham-Number',
        'Earnings Yield (Greenblatt) %', 'Forward Rate of Return (Yacktman) %']
 
-    def gf_scrape(self, ticker):
+    def scrape(self, ticker):
         # summary page scrape
 
         df = pd.DataFrame({'Ticker':[ticker]})
         df = self._summery_scrape(df, ticker)
-        df = self._gf_value_scrape(df, ticker)
+        df = self._value_scrape(df, ticker)
         return df
 
 
@@ -60,7 +60,7 @@ class GFScraper:
                 continue
         return df
 
-    def _gf_value_scrape(self, df, ticker):
+    def _value_scrape(self, df, ticker):
         try:
             url = f'https://www.gurufocus.com/term/gf_value/{ticker}/GF-Value'
             page = requests.get(url)
@@ -111,6 +111,19 @@ class ZacksScraper:
             results['Zacks value score'] = styles.contents[1].text
             results['Zacks growth score'] = styles.contents[5].text
         return results
+
+
+class QuickFSScraper:
+    def __init__(self):
+        pass
+
+    def scrape(self, ticker):
+        #todo data in javascript need selenium
+        url = f'https://quickfs.net/company/{ticker}'
+        page = requests.get(url)
+        soup = BeautifulSoup(page.content, 'html.parser')
+        print('a')
+
 
 
 

@@ -5,7 +5,7 @@ class Analyzer:
         """
 
         :param df:
-        :param bounds: (min/max, value, %/#, importance)
+        :param bounds: (min/max/=, value, %/#, importance)
         """
         self.df = df
         self.bounds = {
@@ -39,13 +39,14 @@ class Analyzer:
             'Price-to-Median-PS-Value': ('max', 1, '#', 1),
             'Price-to-Graham-Number': ('max', 1, '#', 2),
             'Forward Rate of Return (Yacktman) %': ('min', 10, '#', 1),
-            '52W High': [(max, -10, '%', 2),
-                         (max, -20, '%', 2),
-                         (max, -30, '%', 2)],
-            '50D High': (max, -20, '%', 2),
+            '52W High': [('max', -10, '%', 2),
+                         ('max', -20, '%', 2),
+                         ('max', -30, '%', 2)],
+            '50D High': ('max', -20, '%', 2),
             'EV-to-EBITDA': ('max', 10, '#', 1),
             'EV-to-EBIT': ('max', 8, '#', 1),
             'EV-to-Revenue': ('max', 5, '#', 1),
+            #'Country': ('=', 'USA', '#', '1')
         }
 
     def score(self):
@@ -184,7 +185,7 @@ class Analyzer:
         if bounds[0] == 'min':
             min = bounds[1]
             max = None
-        else:
+        elif bounds[0] == 'max':
             min = None
             max = bounds[1]
         if bounds[2] == '%':

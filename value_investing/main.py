@@ -61,7 +61,7 @@ if __name__ == '__main__':
     """
     import time
     start_time = time.time()
-    tickers = ['aapl', 'fb', 'tsla', 'momo', 'baba', 'stla', 'bdsi']
+    tickers = ['aapl', 'fb', 'tsla', 'momo', 'baba', 'stla', 'bdsi', 'ebay']
     tickers.extend(dividend_tickers)
     filters = 'fa_ltdebteq_u0.8,fa_roe_o10,fa_curratio_o1'
     sector_ratio_filters = ['pe']
