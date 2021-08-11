@@ -10,26 +10,35 @@ class Analyzer:
         self.df = df
         self.bounds = {
             #TODO change bounds to be per indestry
-            'Dividend': ('min', 1, '%', 1),
+            'Dividend': [('min', 1, '%', 1),
+                         ('min', 2, '%', 1),
+                         ('min', 3, '%', 1),
+                         ('min', 4, '%', 1),
+                         ('min', 5, '%', 1)],
             'Payout Ratio': [('min', 10, '%', 1),
                              ('min', 90, '%', -1)],
-            'EPS': ('min', 2, '#', 1),
             'EPS this Y': ('min', 5, '%', 1),
             'EPS past 5Y': ('min', 25, '%', 1),
             'PEG': [('max', 2, '#', 1),
                     ('max', 1, '#', 1)],
             'P/S': ('max', 1, '#', 1),
+            'P/B': [('max', 1, '#', 1),
+                    ('max', 1.5, '#', 1)],
             'Insider Own': ('min', 10, '%', 1),
             'Short Ratio': [('max', 3, '#', 1),
-                            ('min', 10, '%', -2)],  # we dont want a lot of short on the company
+                            ('min', 20, '%', -2)],  # we don't want a lot of short on the company
             'Curr R': ('min', 2, '#', 1),
             'Quick R': ('min', 1.5, '#', 1),
-            'ROE': ('min', 15, '%', 2),
-            'LTDebt/Eq': ('max', 0.5, '#', 2),
-            'Gross M': ('min', 25, '%', 1),
+            'ROE': [('min', 10, '%', 1),
+                    ('min', 15, '%', 1),
+                    ('min', 20, '%', 2)],
+            'LTDebt/Eq': [('max', 1, '#', 1),
+                          ('max', 0.5, '#', 1)],
+            'Gross M': [('min', 15, '%', 1),
+                        ('min', 25, '%', 1),
+                        ('min', 35, '%', 1)],
             'Oper M': ('min', 10, '%', 1),
             'Profit M': ('min', 10, '%', 1),
-            'Recom': ('max', 2, '#', 1),
             'Cash-To-Debt': ('min', 2, '#', 1),
             'Piotroski F-Score': ('min', 7, '#', 1),
             'Altman Z-Score': ('min', 3, '#', 1),
@@ -39,14 +48,18 @@ class Analyzer:
             'Price-to-Median-PS-Value': ('max', 1, '#', 1),
             'Price-to-Graham-Number': ('max', 1, '#', 2),
             'Forward Rate of Return (Yacktman) %': ('min', 10, '#', 1),
-            '52W High': [('max', -10, '%', 2),
-                         ('max', -20, '%', 2),
-                         ('max', -30, '%', 2)],
-            '50D High': ('max', -20, '%', 2),
+            '52W High': [('max', -10, '%', 1),
+                         ('max', -20, '%', 1),
+                         ('max', -30, '%', 1)],
+            '50D High': ('max', -20, '%', 1),
             'EV-to-EBITDA': ('max', 10, '#', 1),
             'EV-to-EBIT': ('max', 8, '#', 1),
             'EV-to-Revenue': ('max', 5, '#', 1),
-            #'Country': ('=', 'USA', '#', '1')
+            'FCF 5Y Cagr': [('min', 10, '%', 1),
+                        ('min', 15, '%', 1),
+                        ('min', 20, '%', 1)],
+            'Positive FCF Years': ('min', 5, '#', 1),
+            'Shares Basic 5Y Dilution': ('max', 10, '%', 1)
         }
 
     def score(self):
@@ -75,6 +88,9 @@ class Analyzer:
                 print(f'error in col {col}')
 
 
+        # add one points to USA stock
+        filtered_df = self.filter(col='Country', value='USA')
+        self.point_by_index(filtered_df, importance=1)
 
         # special score
         self._gf_value()
@@ -95,28 +111,32 @@ class Analyzer:
 
 
 
-    def filter(self, col, min=None, max=None, percentage=False):
+    def filter(self, col, min=None, max=None, percentage=False, value=None):
         """
         filter rows based in condition
         :param col:
         :param min:
         :param max:
         :param percentage:
+        :param value: filter specific value
         :return: filtered pandas Dataframe
         """
         # clean rows with out data
         col_df = self.df.loc[self.df[col] != '-', [col]]
+        col_df = self.df.loc[self.df[col] != 'N/A', [col]]
         col_df.dropna()
 
-
-        if percentage:
-            col_df[col] = col_df[col].str.rstrip('%').astype('float')
+        if value:
+            col_df = col_df.loc[col_df[col] == value]
         else:
-            col_df[col] = col_df[col].astype('float')
-        if min:
-            col_df = col_df.loc[col_df[col] >= min]
-        if max:
-            col_df = col_df.loc[col_df[col] <= max]
+            if percentage:
+                col_df[col] = col_df[col].str.rstrip('%').astype('float')
+            else:
+                col_df[col] = col_df[col].astype('float')
+            if min:
+                col_df = col_df.loc[col_df[col] >= min]
+            if max:
+                col_df = col_df.loc[col_df[col] <= max]
         return col_df
 
     def point_by_index(self, index_df, importance):

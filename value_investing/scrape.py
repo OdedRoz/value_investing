@@ -2,6 +2,66 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from user_agent import generate_user_agent
+from quickfs import QuickFS
+import os
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
+
+class QuickFSScraper:
+    def __init__(self):
+        self.client = QuickFS(os.environ.get('API_QUICKFS'))
+
+    def get_data(self, ticker):
+        df = pd.DataFrame({'Ticker': [ticker]})
+        metrics = self.client.get_available_metrics()
+        #fcf_metrics = [m for m in metrics if 'fcf' in m['metric']]
+        fcf_5y = self.client.get_data_range(symbol=ticker, metric='fcf', period='FY-5:FY')
+        fcf_5y_cagr = self._cagr(fcf_5y)
+        df['FCF 5Y Cagr'] = "{:.0%}". format(fcf_5y_cagr)
+        df['Positive FCF Years'] = sum(1 for x in fcf_5y if x > 0)
+        shares_basic_5y = self.client.get_data_range(symbol=ticker, metric='shares_basic', period='FY-5:FY')
+        shares_basic_dilution = self._shares_dilution(shares_basic_5y)
+        shares_diluted_5y = self.client.get_data_range(symbol=ticker, metric='shares_diluted', period='FY-5:FY')
+        shares_diluted_dilution_5y = self._shares_dilution(shares_diluted_5y)
+        df['Shares Basic 5Y Dilution'] = "{:.0%}". format(shares_basic_dilution)
+        df['Shares Diluted 5Y Dilution'] = "{:.0%}".format(shares_diluted_dilution_5y)
+        return df
+
+    def _shares_dilution(self, values):
+        if values[0] > 0 and values[-1] > 0:
+            return (values[-1]/values[0]) - 1
+        # new compeny
+        elif values[0] == 0 and values[-1] > 0:
+            first = next((item for item in values if item > 0), None)
+            return (values[-1]/first) - 1
+
+
+
+    def _cagr(self, values):
+        # simple case
+        if values[0] > 0 and values[-1] > 0:
+            return (values[-1]/values[0])**(1/(len(values)-1)) - 1
+        # no data for first years, get cagr from when data start
+        elif values[0] <= 0 and values[-1] > 0:
+            first = next((item for item in values if item > 0), None)
+            i = values.index(first)
+            return (values[-1] / values[i]) ** (1 / (len(values) - 1 - i)) - 1
+
+        else:
+            return 0
+        #elif values[0] < 0 and values[-1] > 0:
+        #    i, f = values[0], values[-1]
+        #    return ((f - i + abs(i))/abs(i))**(1/len(values)) - 1
+#
+        #else:
+        #    return 0
+
+
+
+
+
+
 
 
 class GFScraper:
@@ -111,23 +171,6 @@ class ZacksScraper:
             results['Zacks value score'] = styles.contents[1].text
             results['Zacks growth score'] = styles.contents[5].text
         return results
-
-
-class QuickFSScraper:
-    def __init__(self):
-        pass
-
-    def scrape(self, ticker):
-        #todo data in javascript need selenium
-        url = f'https://quickfs.net/company/{ticker}'
-        page = requests.get(url)
-        soup = BeautifulSoup(page.content, 'html.parser')
-        print('a')
-
-
-
-
-
 
 
 

@@ -20,6 +20,11 @@ def get_sector_filters(data, ratio_filters=None):
         sector_ps = data['P/S']
         ps_limit = _round_up(sector_ps, 1)
         results.append(f'fa_ps_u{ps_limit}')
+    if 'pb' in ratio_filters:
+        sector_pb = data['P/B']
+        pb_limit = _round_up(sector_pb, 1)
+        results.append(f'fa_pb_u{pb_limit}')
+
     return results
 
 

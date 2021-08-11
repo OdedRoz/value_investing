@@ -6,9 +6,6 @@ from datetime import datetime
 import pathlib
 import os
 
-pathlib.Path("/my/directory").mkdir(parents=True, exist_ok=True)
-
-
 def export(data, method='csv', order_by='score'):
     # clean index
     data = data.drop('No.', axis=1)

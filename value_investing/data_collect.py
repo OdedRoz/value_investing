@@ -7,6 +7,7 @@ from finviz.screener import Screener
 from finvizfinance.group.valuation import Valuation
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from functools import reduce
 
 
 def collect_ticker_data(ticker):
@@ -19,11 +20,12 @@ def collect_ticker_data(ticker):
     zacks_rank = zacks_scraper.rank(ticker)
     zacks_ticker_df = pd.DataFrame({'Ticker': [ticker], **zacks_rank})
 
-    ## quickfs
-    #quickfs_scraper = scrape.QuickFSScraper()
-    #quickfs_ticker_df = quickfs_scraper.scrape(ticker)
+    # quickfs
+    quickfs_scraper = scrape.QuickFSScraper()
+    quickfs_ticker_df = quickfs_scraper.get_data(ticker)
 
-    return pd.merge(gf_ticker_df, zacks_ticker_df, on='Ticker')
+    df = reduce(lambda left, right: pd.merge(left, right, on='Ticker'), [gf_ticker_df, zacks_ticker_df, quickfs_ticker_df])
+    return df
 
 
 
